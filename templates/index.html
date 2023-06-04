@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>HTMX Counter</title>
+  <link rel="stylesheet" href="/assets/style.css"/>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo="/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1>Counter</h1>
+  <form method="post">
+    <button class="element" name="action" value="inc">Increment</button>
+    <p class="element" id="count">
+      <span>Count: {{ count }}</span>
+      <input name="count" value="{{count}}" type="hidden"/>
+    </p>
+    <button class="element" name="action" value="dec">Decrement</button><br/>
+    <div class="element-row">
+      <button class="element" name="action" value="default">Reset to Default</button>
+      <button class="element" name="action" value="set-default">Set Default</button>
+    </div>
+  </form>
+</body>
+</html>
