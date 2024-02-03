@@ -5,3 +5,9 @@ use askama::Template;
 pub(super) struct Counter {
     pub count: i64,
 }
+
+#[derive(Template)]
+#[template(path = "count.html")]
+pub(super) struct Count {
+    pub count: i64,
+}

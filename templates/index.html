@@ -10,12 +10,9 @@
 </head>
 <body>
   <h1>Counter</h1>
-  <form method="post" hx-boost="true" hx-target="#count" hx-swap="outerHTML" hx-indicator="this" hx-disabled-elt="form button.element" hx-select="#count">
+  <form method="post" hx-boost="true" hx-target="#count" hx-swap="outerHTML" hx-indicator="this" hx-disabled-elt="form button.element">
     <button class="element" name="action" value="inc">Increment</button>
-    <p class="element" id="count">
-      <span>Count: {{ count }}</span>
-      <input name="count" value="{{count}}" type="hidden"/>
-    </p>
+    {% include "count.html" %}
     <button class="element" name="action" value="dec">Decrement</button><br/>
     <div class="element-row">
       <button class="element" name="action" value="default">Reset to Default</button>

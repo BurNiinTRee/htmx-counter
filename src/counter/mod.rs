@@ -1,10 +1,11 @@
 use anyhow::{anyhow, Context};
 use axum::{
     extract::{NestedPath, Query, State},
-    response::Redirect,
+    response::{IntoResponse, Redirect, Response},
     Form, Router,
 };
 use axum_extra::routing::{RouterExt, TypedPath};
+use axum_htmx::{HxBoosted, HxPushUrl};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, SqlitePool};
 
@@ -55,22 +56,42 @@ async fn post_counter(
     _: Counter,
     State(db): State<SqlitePool>,
     root: NestedPath,
+    HxBoosted(is_boosted): HxBoosted,
     Form(action): Form<CounterAction>,
-) -> Result<Redirect> {
+) -> Result<Response> {
     Ok(match action.action.as_str() {
-        "inc" => Redirect::to(&concat_url(
-            root,
-            Some(CounterState {
-                count: action.count + 1,
-            }),
-        )),
-        "dec" => Redirect::to(&concat_url(
-            root,
-            Some(CounterState {
-                count: action.count - 1,
-            }),
-        )),
-        "default" => Redirect::to(&concat_url(root, None)),
+        "inc" => {
+            let count = action.count + 1;
+            let url = concat_url(root, Some(CounterState { count }));
+            if is_boosted {
+                (HxPushUrl(url.parse()?), tmpl::Count { count }).into_response()
+            } else {
+                Redirect::to(&url).into_response()
+            }
+        }
+        "dec" => {
+            let count = action.count - 1;
+            let url = concat_url(root, Some(CounterState { count }));
+            if is_boosted {
+                (HxPushUrl(url.parse()?), tmpl::Count { count }).into_response()
+            } else {
+                Redirect::to(&url).into_response()
+            }
+        }
+        "default" => {
+            let url = concat_url(root, None);
+            if is_boosted {
+                (
+                    HxPushUrl(url.parse()?),
+                    tmpl::Count {
+                        count: default(&db).await?,
+                    },
+                )
+                    .into_response()
+            } else {
+                Redirect::to(&url).into_response()
+            }
+        }
         "set-default" => {
             query!(
                 r#"UPDATE SettingsInt SET value = ? WHERE name = "DefaultCount""#,
@@ -78,7 +99,18 @@ async fn post_counter(
             )
             .execute(&db)
             .await?;
-            Redirect::to(&concat_url(root, None))
+            let url = concat_url(root, None);
+            if is_boosted {
+                (
+                    HxPushUrl(url.parse()?),
+                    tmpl::Count {
+                        count: action.count,
+                    },
+                )
+                    .into_response()
+            } else {
+                Redirect::to(&url).into_response()
+            }
         }
         action => Err(anyhow!("{} is not a valid action", action))?,
     })
