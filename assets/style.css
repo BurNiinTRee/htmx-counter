@@ -41,3 +41,16 @@ p.element {
   display: flex;
   gap: 0.5em;
 }
+
+#count {
+  transition: font-size 100ms ease;
+}
+
+#count.htmx-swapping {
+  font-size: 1.7em;
+}
+
+form.htmx-request button.element {
+  opacity: 0.4;
+  transition: opacity 200ms 100ms ease-in;
+}

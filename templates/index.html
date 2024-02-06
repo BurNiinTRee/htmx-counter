@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8"/>
   <title>HTMX Counter</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <link rel="stylesheet" href="/assets/style.css"/>
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo="/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <h1>Counter</h1>
-  <form method="post">
+  <form method="post" hx-boost="true" hx-target="#count" hx-swap="outerHTML" hx-indicator="this" hx-disabled-elt="form button.element" hx-select="#count">
     <button class="element" name="action" value="inc">Increment</button>
     <p class="element" id="count">
       <span>Count: {{ count }}</span>
